@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Puente Hoja DnD → Roll20
 // @namespace    hoja-dnd-roll20
-// @version      1.1.0
+// @version      1.1.1
 // @description  Lleva al chat de Roll20 las tiradas que se disparan desde la hoja interactiva (hoja_artifice.html). Funciona como Beyond20: escribe en el chat de la partida y pulsa Enviar.
 // @author       Claudio Flores
-// @homepageURL  https://github.com/balker123456/hoja-artifice
-// @updateURL    https://raw.githubusercontent.com/balker123456/hoja-artifice/main/puente_roll20.user.js
-// @downloadURL  https://raw.githubusercontent.com/balker123456/hoja-artifice/main/puente_roll20.user.js
+// @homepageURL  https://github.com/balker123456/rol
+// @updateURL    https://raw.githubusercontent.com/balker123456/rol/main/puente_roll20.user.js
+// @downloadURL  https://raw.githubusercontent.com/balker123456/rol/main/puente_roll20.user.js
 // @match        https://app.roll20.net/editor/*
 // @match        https://app.roll20.net/editor
 // @match        https://balker123456.github.io/*

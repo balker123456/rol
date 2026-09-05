@@ -27,11 +27,11 @@ Modo *Ventaja/Desventaja* y *Susurrar al DM* están en la barra superior y afect
 
 Si no hay conexión, el botón copia el comando al portapapeles: pégalo en el chat de Roll20 con Ctrl+V y sale igual.
 
-## Camino recomendado: GitHub Pages (usuario balker123456)
+## Camino recomendado: GitHub Pages (repo balker123456/rol)
 
-1. Crea el repositorio público `hoja-artifice` en github.com/balker123456 y sube `hoja_artifice.html` y `puente_roll20.user.js` a la rama `main`.
-2. *Settings → Pages → Source: Deploy from a branch → main → / (root)*. La hoja queda en `https://balker123456.github.io/hoja-artifice/hoja_artifice.html`.
-3. Instala el script abriendo en Chrome `https://raw.githubusercontent.com/balker123456/hoja-artifice/main/puente_roll20.user.js`: Tampermonkey lo detecta y ofrece *Instalar*. El script trae `@updateURL`, así que cada vez que subas una versión nueva al repo (subiendo el número de `@version`), Tampermonkey se actualiza solo.
+1. El repositorio público es `github.com/balker123456/rol`, con `hoja_artifice.html`, `puente_roll20.user.js` e `index.html` (redirige a la hoja) en la rama `main`.
+2. GitHub Pages está activo desde `main / (root)`. La hoja queda en **https://balker123456.github.io/rol/** (o `https://balker123456.github.io/rol/hoja_artifice.html`).
+3. Instala el script abriendo en Chrome `https://raw.githubusercontent.com/balker123456/rol/main/puente_roll20.user.js`: Tampermonkey lo detecta y ofrece *Instalar*. El script trae `@updateURL`, así que cada vez que subas una versión nueva al repo (subiendo el número de `@version`), Tampermonkey se actualiza solo.
 4. Con este camino no necesitas el paso 1.3 (acceso a URL de archivo). Sí sigues necesitando Tampermonkey con el *Modo de desarrollador* activado.
 
 Los datos del personaje (nombre, PG, espacios gastados) viven en el navegador, no en el archivo publicado; para pasarlos a otro dispositivo usa *Exportar/Importar JSON*.
