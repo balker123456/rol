@@ -1,0 +1,293 @@
+{
+  "nombre": "Yako",
+  "jugador": "Claudio",
+  "raza": "Goblin (Mordenkainen)",
+  "trasfondo": "Constructor naval",
+  "alineamiento": "",
+  "nivel": 10,
+  "subclase": "Armero",
+  "atributos": {
+    "fue": 8,
+    "des": 12,
+    "con": 16,
+    "int": 20,
+    "sab": 12,
+    "car": 11
+  },
+  "salv": {
+    "fue": false,
+    "des": false,
+    "con": true,
+    "int": true,
+    "sab": false,
+    "car": false
+  },
+  "habs": {
+    "acrobacias": 0,
+    "animales": 0,
+    "arcanos": 1,
+    "atletismo": 0,
+    "engano": 0,
+    "historia": 1,
+    "perspicacia": 0,
+    "intimidacion": 0,
+    "investigacion": 1,
+    "medicina": 0,
+    "naturaleza": 0,
+    "percepcion": 1,
+    "interpretacion": 0,
+    "persuasion": 0,
+    "religion": 0,
+    "manos": 0,
+    "sigilo": 0,
+    "supervivencia": 0
+  },
+  "ca": 23,
+  "velocidad": 30,
+  "hpMax": 83,
+  "hpActual": 83,
+  "hpTemp": 0,
+  "dgUsados": 0,
+  "iniExtra": 0,
+  "salvExtra": 1,
+  "ataques": [
+    {
+      "nombre": "Guanteletes de Trueno (Arma mejorada +2)",
+      "atr": "int",
+      "comp": true,
+      "bono": 2,
+      "dados": "1d8",
+      "sinMod": false,
+      "tipo": "trueno · el objetivo tiene desventaja para atacar a otros hasta tu próximo turno"
+    },
+    {
+      "nombre": "Homúnculo: Golpe de fuerza (30 pies)",
+      "atr": "int",
+      "comp": true,
+      "bono": 0,
+      "dados": "1d4+4",
+      "sinMod": true,
+      "tipo": "fuerza · actúa en tu turno con tu acción adicional"
+    }
+  ],
+  "conjuros": [
+    {
+      "nombre": "Rayo de fuego (truco)",
+      "nivel": 0,
+      "tipo": "ataque",
+      "dados": "2d10",
+      "salv": "",
+      "nota": "120 pies, fuego"
+    },
+    {
+      "nombre": "Orientación (truco)",
+      "nivel": 0,
+      "tipo": "ninguno",
+      "dados": "1d4",
+      "salv": "",
+      "nota": "Toque, concentración: +1d4 a una prueba de característica"
+    },
+    {
+      "nombre": "Reparar (truco)",
+      "nivel": 0,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "1 minuto, repara una rotura"
+    },
+    {
+      "nombre": "Proyectil mágico (Armero)",
+      "nivel": 1,
+      "tipo": "ninguno",
+      "dados": "3d4+3",
+      "salv": "",
+      "nota": "3 dardos de 1d4+1, fuerza, 120 pies, impacto automático",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Onda atronadora (Armero)",
+      "nivel": 1,
+      "tipo": "salvacion",
+      "dados": "2d8",
+      "salv": "CON",
+      "nota": "CON · cubo 15 pies · trueno, empuja 10 pies",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Absorber elementos",
+      "nivel": 1,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Reacción: resistencia al daño elemental; +1d6 en el próximo golpe cuerpo a cuerpo",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Curar heridas",
+      "nivel": 1,
+      "tipo": "ninguno",
+      "dados": "1d8+5",
+      "salv": "",
+      "nota": "Toque",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Fuego feérico",
+      "nivel": 1,
+      "tipo": "salvacion",
+      "dados": "",
+      "salv": "DES",
+      "nota": "DES · cubo 20 pies · ventaja para atacar a los afectados",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Santuario",
+      "nivel": 1,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Acción adicional · quien ataque al objetivo tira salvación de SAB",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Imagen múltiple (Armero)",
+      "nivel": 2,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "3 duplicados, 1 minuto, sin concentración",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Destrozar (Armero)",
+      "nivel": 2,
+      "tipo": "salvacion",
+      "dados": "3d8",
+      "salv": "CON",
+      "nota": "CON · esfera 10 pies · trueno · 60 pies",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Ayuda",
+      "nivel": 2,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "+5 PG máximos y actuales a 3 criaturas, 8 horas",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Calentar metal",
+      "nivel": 2,
+      "tipo": "salvacion",
+      "dados": "2d8",
+      "salv": "CON",
+      "nota": "CON para no soltar el objeto · fuego · acción adicional para repetir",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Restablecimiento menor",
+      "nivel": 2,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Quita ceguera, sordera, parálisis o envenenamiento",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Patrón hipnótico (Armero)",
+      "nivel": 3,
+      "tipo": "salvacion",
+      "dados": "",
+      "salv": "SAB",
+      "nota": "SAB · cubo 30 pies · hechizados e incapacitados · concentración",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Relámpago (Armero)",
+      "nivel": 3,
+      "tipo": "salvacion",
+      "dados": "8d6",
+      "salv": "DES",
+      "nota": "DES · línea 100 pies · relámpago",
+      "siempre": true,
+      "preparado": false
+    },
+    {
+      "nombre": "Disipar magia",
+      "nivel": 3,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Prueba de INT (CD 10 + nivel del conjuro) para efectos de nivel 4+",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Celeridad",
+      "nivel": 3,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Concentración · velocidad ×2, +2 CA, ventaja en DES, acción extra",
+      "siempre": false,
+      "preparado": true
+    },
+    {
+      "nombre": "Revivificar",
+      "nivel": 3,
+      "tipo": "ninguno",
+      "dados": "",
+      "salv": "",
+      "nota": "Diamantes por 300 po · muerto hace menos de 1 minuto",
+      "siempre": false,
+      "preparado": true
+    }
+  ],
+  "slotsUsados": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0
+  },
+  "destelloUsados": 0,
+  "contadores": [
+    {
+      "nombre": "Campo Defensivo (PG temporales = nivel)",
+      "max": 4,
+      "usados": 0,
+      "mensaje": "Acción adicional: gana 10 PG temporales hasta que acaben o hasta el próximo descanso largo",
+      "corto": false
+    },
+    {
+      "nombre": "Furia de los Pequeños (+4 daño)",
+      "max": 4,
+      "usados": 0,
+      "mensaje": "+4 de daño a una criatura más grande que yo (una vez por turno)",
+      "corto": false
+    }
+  ],
+  "infusiones": "Defensa mejorada (+2 CA a nivel 10) — escudo\nArma mejorada (+2 ataque y daño a nivel 10) — Guanteletes de Trueno\nReplicar objeto mágico: Botas aladas — botas de la Armadura Arcana (vuelo igual a tu velocidad, 4 horas al día, recupera 2 h por cada 12 h sin usar)\nReplicar objeto mágico: Yelmo de la Consciencia — casco de la Armadura Arcana (no puedes ser sorprendido, ventaja en iniciativa)\nReplicar objeto mágico: Capa de protección (+1 CA y +1 a todas las salvaciones)\nSirviente homúnculo (gema de 100 po): CA 13, 16 PG, vuela 30 pies, Golpe de fuerza 1d4+4, Evasión, Canalizar magia (lanza por ti los conjuros de toque a 120 pies)\n— En reserva (conocidas, no activas) —\nEscudo de repulsión (+1 CA; reacción al ser golpeado en cuerpo a cuerpo: empuja 15 pies; 4 cargas) — requiere sintonización\nReplicar objeto mágico: Bolsa de contención",
+  "objetosInfundidos": "Escudo → Defensa mejorada +2 → yo\nGuanteletes de Trueno → Arma mejorada +2 → yo\nBotas → Botas aladas → yo\nCasco → Yelmo de la Consciencia → yo\nCapa → Capa de protección → yo\nGema de 100 po → Sirviente homúnculo\nPechera → (sin infusión)\n(6 objetos: 4 base + 2 exclusivos de las piezas de la armadura por Modificaciones de Armadura)\nSintonizaciones: botas, yelmo, capa y el arma mágica del DM = 4 de 4 (Adepto de objetos mágicos).",
+  "herramientas": "Herramientas de ladrón, herramientas de manitas, una de artesano a elección (clase), herramientas de herrero (Armero), herramientas de carpintero y vehículos acuáticos (Constructor naval).\nPericia con herramientas (nv 6): doble competencia en pruebas con herramientas.\nArmadura: ligera, media, pesada (Armero) y escudos. Armas: simples.\nIdiomas: común y goblin.",
+  "rasgosTexto": "— GOBLIN (Mordenkainen) —\nHumanoide (goblinoide), tamaño Pequeño, 30 pies. Visión en la oscuridad 60 pies.\nAscendencia feérica: ventaja en salvaciones contra hechizado.\nFuria de los Pequeños: al dañar a una criatura de tamaño mayor, +4 de daño (bono de competencia). 4 usos por descanso largo, una vez por turno.\nEscape ágil: Retirarse u Ocultarse como acción adicional en cada turno.\n\n— ARMERO (Guardián) —\nHerramientas del oficio (nv 3): competencia con armadura pesada y herramientas de herrero.\nArmadura Arcana (nv 3): la armadura de placas es foco de conjuros, ignora el requisito de Fuerza, no se te puede quitar contra tu voluntad, cubre el cuerpo entero, el casco se pliega como acción adicional, se pone y se quita como acción.\nGuanteletes de Trueno: arma simple cuerpo a cuerpo, 1d8 trueno, ataque y daño con INT. La criatura golpeada tiene desventaja para atacar a cualquier otro objetivo hasta el inicio de tu próximo turno.\nCampo Defensivo: acción adicional, PG temporales = nivel (10). Usos = bono de competencia (4) por descanso largo.\nCambiar de modelo (Guardián ↔ Infiltrador): al acabar un descanso, con herramientas de herrero.\nAtaque adicional (nv 5): dos ataques con la acción de Atacar.\nModificaciones de Armadura (nv 9): la armadura cuenta como 4 objetos para infusiones (pechera, botas, casco, arma) y el tope de objetos infundidos sube en 2 (solo para esas piezas).\nConjuros de Armero siempre preparados (no cuentan en el límite): Proyectil mágico, Onda atronadora, Imagen múltiple, Destrozar, Patrón hipnótico, Relámpago.\n\n— CONSTRUCTOR NAVAL (Ghosts of Saltmarsh) —\n¡Yo lo arreglo!: con herramientas de carpintero y madera, reparas el casco de una embarcación por 5 × bono de competencia (20) PG; no se puede repetir hasta que el barco se repare por completo en tierra.",
+  "equipo": "Armadura de placas (Armadura Arcana, CA 18) + escudo (+2) → CA 23 con Defensa mejorada +2 (en el escudo) y Capa de protección +1.\nARMA MÁGICA DEL DM (con sintonización): detalles pendientes — anotar aquí y, si se usa para atacar, añadirla en Ataques.\nCapa de protección: +1 a todas las salvaciones (ya sumado en la hoja).\nHerramientas de ladrón, de manitas, de herrero, de carpintero y una de artesano más.\nBallesta ligera y 20 virotes (por si la armadura no está puesta).\nMochila, saco de dormir, raciones, cuerda, antorchas, cantimplora, libro en blanco, tinta y pluma, diamantes por 300 po para Revivificar.",
+  "notas": "Compra de puntos: FUE 8 (0) · DES 12 (4) · CON 14 (7) · INT 15 (9) · SAB 12 (4) · CAR 11 (3) = 27.\nGoblin +2 INT, +1 CON. Nv 4: +1 INT, +1 CON. Nv 8: +2 INT.\nPG: 8 + 9×5 + 10×3 = 83.\nConjuros preparados: 10 (INT 5 + nivel/2 = 5) + los 6 de Armero, que no cuentan. Trucos: 3.",
+  "modo": "normal",
+  "susurrar": false,
+  "copiarSiNo": true,
+  "soloPreparados": false
+}

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Marcador que el userscript "Puente Hoja DnD → Roll20" busca para activarse en esta página. No borrar. -->
+<meta name="hoja-dnd-roll20" content="1">
+<title>Hoja de Artífice — D&amp;D 5e</title>
+<style>
+  :root{
+    --fondo:#0b1020; --papel:#141b2d; --blanco:#1c2540; --tinta:#e7ecf7; --borde:#2b3652;
+    --cobre:#22d3ee; --cobre-osc:#67e8f9; --violeta:#8b5cf6; --violeta-cl:#c4b5fd;
+    --verde:#4ade80; --rojo:#fb7185; --ambar:#fbbf24; --gris:#8d99b8; --oscuro:#071a20;
+    --sombra:0 6px 18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fondo);background-image:radial-gradient(1000px 500px at 10% -10%,rgba(139,92,246,.18),transparent 60%),radial-gradient(800px 400px at 100% 0%,rgba(34,211,238,.14),transparent 60%);background-attachment:fixed;color:var(--tinta);font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+  h1,h2,h3{margin:0;font-weight:800}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--cobre);padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid var(--borde);position:relative}
+  h2::after{content:"";position:absolute;left:0;bottom:-1px;width:56px;height:2px;background:linear-gradient(90deg,var(--cobre),var(--violeta))}
+  .barra{position:sticky;top:0;z-index:10;background:rgba(11,16,32,.92);backdrop-filter:blur(8px);color:var(--tinta);display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--borde)}
+  .barra strong{background:linear-gradient(90deg,var(--cobre),var(--violeta-cl));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:17px;font-weight:800;letter-spacing:.02em}
+  .barra .estado{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gris)}
+  .punto{width:10px;height:10px;border-radius:50%;background:var(--gris);display:inline-block;box-shadow:0 0 0 3px rgba(255,255,255,.04)}
+  .punto.ok{background:var(--verde);box-shadow:0 0 10px var(--verde)}.punto.mal{background:var(--rojo);box-shadow:0 0 10px var(--rojo)}.punto.medio{background:var(--ambar);box-shadow:0 0 10px var(--ambar)}
+  .barra .sep{flex:1}
+  .barra label{font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer}
+  .barra select,.barra button{font:inherit;font-size:13px;padding:5px 10px;border-radius:8px;border:1px solid var(--borde);background:var(--blanco);color:var(--tinta);cursor:pointer}
+  .barra button:hover{border-color:var(--cobre);color:var(--cobre)}
+  .pagina{max-width:1240px;margin:16px auto;padding:0 12px;display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+  .caja{background:var(--papel);border:1px solid var(--borde);border-radius:14px;padding:14px;box-shadow:var(--sombra)}
+  .c12{grid-column:span 12}.c8{grid-column:span 8}.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3}
+  @media (max-width:900px){.c8,.c6,.c4,.c3{grid-column:span 12}}
+  input[type=text],input[type=number],select,textarea{font:inherit;color:var(--tinta);background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:5px 8px;width:100%;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cobre);box-shadow:0 0 0 3px rgba(34,211,238,.18)}
+  input::placeholder,textarea::placeholder{color:#5c688a}
+  input[type=number]{width:64px;text-align:center}
+  input[type=checkbox]{accent-color:var(--cobre)}
+  textarea{min-height:90px;resize:vertical}
+  .fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .campo{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px}
+  .campo small,.stat small,.item small{color:var(--gris);text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:600}
+  button.tirar{font:inherit;font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--cobre),#38bdf8);color:var(--oscuro);border:0;border-radius:8px;padding:5px 12px;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(34,211,238,.25);transition:transform .1s,filter .15s}
+  button.tirar:hover{filter:brightness(1.12);transform:translateY(-1px)}
+  button.tirar:active{transform:translateY(0)}
+  button.sec{font:inherit;font-size:12px;font-weight:600;background:transparent;color:var(--violeta-cl);border:1px solid var(--violeta);border-radius:8px;padding:4px 10px;cursor:pointer}
+  button.sec:hover{background:rgba(139,92,246,.15)}
+  button.peligro{border-color:var(--rojo);color:var(--rojo)}
+  button.peligro:hover{background:rgba(251,113,133,.12)}
+  /* atributos */
+  .atributos{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  @media (max-width:900px){.atributos{grid-template-columns:repeat(3,1fr)}}
+  .atr{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:5px;align-items:center}
+  .atr .nom{font-weight:700;font-size:11px;letter-spacing:.1em;color:var(--gris)}
+  .atr .mod{font-size:30px;line-height:1;font-weight:800;background:linear-gradient(180deg,#fff,var(--cobre));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .atr input[type=number]{width:56px}
+  .atr .salv{font-size:12px;display:flex;align-items:center;gap:4px;justify-content:center}
+  .atr .botones{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+  .atr button.tirar{padding:3px 8px;font-size:12px}
+  /* habilidades */
+  table{width:100%;border-collapse:collapse}
+  td,th{padding:4px;border-bottom:1px solid var(--borde);text-align:left;vertical-align:middle}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris)}
+  td.num{text-align:center;font-weight:800;width:40px;color:var(--cobre)}
+  td.acc{text-align:right;white-space:nowrap}
+  .comp{display:inline-flex;gap:2px}
+  .comp button{width:22px;height:22px;border:1px solid var(--borde);background:var(--blanco);color:var(--gris);border-radius:6px;cursor:pointer;font-size:11px;padding:0}
+  .comp button.on{background:var(--violeta);color:#fff;border-color:var(--violeta)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+  .stat{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:10px 8px;text-align:center}
+  .stat .v{font-size:26px;font-weight:800;color:#fff}
+  .stat input[type=number]{width:70px;font-size:18px;font-weight:700}
+  .slots{display:flex;flex-wrap:wrap;gap:10px}
+  .slot{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;align-items:center;min-width:84px}
+  .slot small{color:var(--gris);text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:600}
+  .slot .cajitas{display:flex;gap:4px}
+  .slot .cajitas span{width:16px;height:16px;border:2px solid var(--violeta);border-radius:4px;cursor:pointer;display:inline-block;transition:background .1s}
+  .slot .cajitas span.usado{background:var(--violeta);box-shadow:0 0 8px rgba(139,92,246,.6)}
+  .lista-filas .item{display:grid;gap:6px;align-items:end;padding:8px;border:1px solid var(--borde);border-radius:10px;background:var(--blanco);margin-bottom:8px}
+  .ataque-grid{grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr auto auto}
+  .conjuro-grid{grid-template-columns:auto 2fr 70px 1fr 1fr 1fr auto auto}
+  @media (max-width:900px){.ataque-grid,.conjuro-grid{grid-template-columns:1fr 1fr}}
+  .item.no-preparado{opacity:.45}
+  .item.no-preparado:hover{opacity:.8}
+  .prep{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:44px}
+  .prep input[type=checkbox]{width:18px;height:18px;cursor:pointer}
+  .prep .siempre{font-size:9px;color:var(--ambar);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .registro{font-family:Consolas,Menlo,monospace;font-size:12px;background:var(--fondo);border:1px solid var(--borde);border-radius:10px;padding:10px;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+  .registro .ok{color:var(--verde)}.registro .mal{color:var(--rojo)}.registro .t{color:var(--gris)}
+  .aviso{background:rgba(251,191,36,.10);border:1px solid var(--ambar);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:8px}
+  .rasgos{padding-left:18px}
+  .rasgos li{margin-bottom:5px}
+  .rasgos li.futuro{color:var(--gris);opacity:.7}
+  .rasgos li b{color:var(--violeta-cl)}
+  .marca{font-size:11px;color:var(--gris)}
+  .marca b{color:var(--tinta)}
+  .oculto{display:none!important}
+  code{background:var(--blanco);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <strong>Hoja de Artífice</strong>
+  <span class="estado"><span id="puntoScript" class="punto"></span><span id="txtScript">Script: buscando…</span></span>
+  <span class="estado"><span id="puntoR20" class="punto"></span><span id="txtR20">Roll20: sin señal</span></span>
+  <span class="sep"></span>
+  <label>Modo
+    <select id="modo">
+      <option value="normal">Normal</option>
+      <option value="ventaja">Ventaja</option>
+      <option value="desventaja">Desventaja</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="susurrar"> Susurrar al DM</label>
+  <label><input type="checkbox" id="copiarSiNo" checked> Copiar comando si no hay conexión</label>
+  <button id="btnExportar">Exportar JSON</button>
+  <button id="btnImportar">Importar JSON</button>
+  <input type="file" id="archivoImportar" accept="application/json" class="oculto">
+</div>
+
+<div class="pagina">
+
+  <!-- Encabezado -->
+  <div class="caja c12">
+    <div class="fila">
+      <div class="campo" style="flex:2"><small>Nombre del personaje</small><input type="text" data-k="nombre" placeholder="Nombre"></div>
+      <div class="campo"><small>Jugador</small><input type="text" data-k="jugador"></div>
+      <div class="campo"><small>Raza</small><input type="text" data-k="raza"></div>
+      <div class="campo"><small>Trasfondo</small><input type="text" data-k="trasfondo"></div>
+      <div class="campo"><small>Alineamiento</small><input type="text" data-k="alineamiento"></div>
+      <div class="campo" style="min-width:90px;flex:0"><small>Nivel</small><input type="number" data-k="nivel" min="1" max="20"></div>
+      <div class="campo"><small>Especialidad (subclase)</small>
+        <select data-k="subclase">
+          <option value="">— sin elegir —</option>
+          <option value="Alquimista">Alquimista</option>
+          <option value="Armero">Armero</option>
+          <option value="Artillero">Artillero</option>
+          <option value="Forjador de Batalla">Forjador de Batalla</option>
+        </select>
+      </div>
+    </div>
+    <div class="fila marca" style="margin-top:8px;font-size:12px">
+      <span>Clase: <b>Artífice</b> · Dado de golpe <b>d8</b> · Conjuros con <b>Inteligencia</b> · Salvaciones con competencia: <b>CON e INT</b></span>
+      <span class="sep"></span>
+      <span>Bono de competencia: <b id="bcTxt">+2</b></span>
+    </div>
+  </div>
+
+  <!-- Atributos -->
+  <div class="caja c12">
+    <h2>Atributos y salvaciones</h2>
+    <div class="atributos" id="atributos"></div>
+  </div>
+
+  <!-- Combate -->
+  <div class="caja c4">
+    <h2>Combate</h2>
+    <div class="stats">
+      <div class="stat"><small>Clase de armadura</small><input type="number" data-k="ca"></div>
+      <div class="stat"><small>Iniciativa</small><div class="v" id="iniTxt">+0</div><button class="tirar" id="btnIni">Tirar</button></div>
+      <div class="stat"><small>Velocidad</small><input type="number" data-k="velocidad"></div>
+      <div class="stat"><small>PG máximos</small><input type="number" data-k="hpMax"></div>
+      <div class="stat"><small>PG actuales</small><input type="number" data-k="hpActual"></div>
+      <div class="stat"><small>PG temporales</small><input type="number" data-k="hpTemp"></div>
+      <div class="stat"><small>Dados de golpe usados</small><input type="number" data-k="dgUsados" min="0"> <div class="marca" id="dgTxt"></div></div>
+      <div class="stat"><small>Otros bonos a iniciativa</small><input type="number" data-k="iniExtra"></div>
+      <div class="stat"><small>Bono a todas las salvaciones</small><input type="number" data-k="salvExtra" title="Capa de protección, Alma de artificio…"></div>
+    </div>
+    <div class="fila" style="margin-top:8px">
+      <button class="tirar" id="btnDG">Dado de golpe (1d8+CON)</button>
+      <button class="tirar" id="btnMuerte">Salvación de muerte</button>
+      <button class="sec" id="btnDescansoCorto">Descanso corto</button>
+      <button class="sec" id="btnDescansoLargo">Descanso largo</button>
+    </div>
+    <div class="fila" style="margin-top:6px">
+      <div class="campo"><small>Tirada libre (sintaxis Roll20)</small>
+        <div class="fila"><input type="text" id="libre" placeholder="Ej: 2d6+3" style="flex:1"><button class="tirar" id="btnLibre">Tirar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Habilidades -->
+  <div class="caja c8">
+    <h2>Habilidades</h2>
+    <div class="marca" style="margin-bottom:6px">Competencia: pulsa ○ (ninguna) · ● (competente) · ★ (pericia). Percepción pasiva: <b id="percPasiva">10</b></div>
+    <table id="habilidades"></table>
+  </div>
+
+  <!-- Ataques -->
+  <div class="caja c12">
+    <h2>Ataques y armas</h2>
+    <div class="marca" style="margin-bottom:6px">El bono de ataque se calcula: competencia (si marcas) + modificador del atributo + bono. El daño suma el mismo modificador salvo que marques «sin mod». Un Forjador de Batalla o un Armero puede elegir INT.</div>
+    <div class="lista-filas" id="ataques"></div>
+    <button class="sec" id="btnNuevoAtaque">+ Añadir ataque</button>
+  </div>
+
+  <!-- Conjuros -->
+  <div class="caja c8">
+    <h2>Conjuros</h2>
+    <div class="stats" style="margin-bottom:10px">
+      <div class="stat"><small>CD de salvación</small><div class="v" id="cdTxt">—</div></div>
+      <div class="stat"><small>Ataque de conjuro</small><div class="v" id="atqConjTxt">—</div><button class="tirar" id="btnAtqConj">Tirar</button></div>
+      <div class="stat"><small>Conjuros preparados</small><div class="v" id="prepTxt">—</div><span class="marca">marcados / máximo (INT + mitad del nivel)</span></div>
+      <div class="stat"><small>Trucos conocidos</small><div class="v" id="trucosTxt">—</div></div>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="marca" style="margin:6px 0 10px">Marca los espacios usados haciendo clic. Se restauran con «Descanso largo».</div>
+    <div class="fila" style="margin-bottom:8px">
+      <label class="marca" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="soloPreparados"> Mostrar solo preparados</label>
+      <span class="marca">La casilla de la izquierda marca el conjuro como preparado. Los trucos y los conjuros de Armero están siempre preparados y no cuentan.</span>
+    </div>
+    <div class="lista-filas" id="conjuros"></div>
+    <button class="sec" id="btnNuevoConjuro">+ Añadir conjuro</button>
+  </div>
+
+  <!-- Recursos de clase -->
+  <div class="caja c4">
+    <h2>Recursos de clase</h2>
+    <div class="stats">
+      <div class="stat"><small>Infusiones conocidas</small><div class="v" id="infConTxt">—</div></div>
+      <div class="stat"><small>Objetos infundidos a la vez</small><div class="v" id="infObjTxt">—</div></div>
+      <div class="stat" id="cajaDestello"><small>Destello de genio (usos)</small><div class="v"><span id="destelloRest">—</span></div>
+        <div class="fila" style="justify-content:center"><button class="sec" id="btnDestello">Usar (+INT a una tirada)</button></div>
+      </div>
+    </div>
+    <h2 style="margin-top:12px">Recursos con usos</h2>
+    <div class="marca" style="margin-bottom:6px">«Usar» gasta uno y lo anuncia en Roll20. Se restauran con «Descanso largo» (o corto, si lo marcas).</div>
+    <div class="lista-filas" id="contadores"></div>
+    <button class="sec" id="btnNuevoContador">+ Añadir recurso</button>
+    <div class="campo" style="margin-top:8px"><small>Infusiones conocidas</small><textarea data-k="infusiones" placeholder="Una por línea"></textarea></div>
+    <div class="campo" style="margin-top:8px"><small>Objetos infundidos ahora</small><textarea data-k="objetosInfundidos" placeholder="Objeto → infusión → quién lo lleva"></textarea></div>
+    <div class="campo" style="margin-top:8px"><small>Herramientas y otras competencias</small><textarea data-k="herramientas" placeholder="Herramientas de ladrón, herramientas de manitas, un tipo de herramientas de artesano…"></textarea></div>
+  </div>
+
+  <!-- Rasgos -->
+  <div class="caja c6">
+    <h2>Rasgos de Artífice por nivel</h2>
+    <ul class="rasgos" id="rasgos"></ul>
+    <div class="campo" style="margin-top:8px"><small>Rasgos de la especialidad, raza y trasfondo (texto libre)</small><textarea data-k="rasgosTexto" style="min-height:140px"></textarea></div>
+  </div>
+
+  <!-- Equipo y notas -->
+  <div class="caja c6">
+    <h2>Equipo y notas</h2>
+    <div class="campo"><small>Equipo</small><textarea data-k="equipo" style="min-height:120px"></textarea></div>
+    <div class="campo" style="margin-top:8px"><small>Notas</small><textarea data-k="notas" style="min-height:120px"></textarea></div>
+  </div>
+
+  <!-- Registro -->
+  <div class="caja c12">
+    <h2>Registro de tiradas enviadas</h2>
+    <div id="avisoScript" class="aviso">No se detecta el userscript <b>Puente Hoja DnD → Roll20</b> en esta pestaña. Las tiradas no llegarán a Roll20; si «Copiar comando» está activo, cada botón copia el comando al portapapeles para pegarlo en el chat. Revisa el archivo <code>INSTALACION.md</code>.</div>
+    <div class="registro" id="registro"></div>
+    <div class="fila" style="margin-top:6px"><button class="sec" id="btnLimpiarRegistro">Limpiar registro</button><span class="sep"></span><button class="sec peligro" id="btnBorrarTodo">Borrar toda la hoja</button></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const CLAVE = 'hoja-artifice-v2';
+
+  // ---------- Datos fijos de la clase ----------
+  const ATRS = [
+    {k:'fue', n:'Fuerza', ab:'FUE'}, {k:'des', n:'Destreza', ab:'DES'}, {k:'con', n:'Constitución', ab:'CON'},
+    {k:'int', n:'Inteligencia', ab:'INT'}, {k:'sab', n:'Sabiduría', ab:'SAB'}, {k:'car', n:'Carisma', ab:'CAR'}
+  ];
+  const HABS = [
+    ['acrobacias','Acrobacias','des'], ['animales','Trato con Animales','sab'], ['arcanos','Arcanos','int'],
+    ['atletismo','Atletismo','fue'], ['engano','Engaño','car'], ['historia','Historia','int'],
+    ['perspicacia','Perspicacia','sab'], ['intimidacion','Intimidación','car'], ['investigacion','Investigación','int'],
+    ['medicina','Medicina','sab'], ['naturaleza','Naturaleza','int'], ['percepcion','Percepción','sab'],
+    ['interpretacion','Interpretación','car'], ['persuasion','Persuasión','car'], ['religion','Religión','int'],
+    ['manos','Juego de Manos','des'], ['sigilo','Sigilo','des'], ['supervivencia','Supervivencia','sab']
+  ];
+  // Espacios de conjuro del Artífice (lanzador de mitad de progresión, con espacios desde nivel 1)
+  const SLOTS = {
+    1:[2],2:[2],3:[3],4:[3],5:[4,2],6:[4,2],7:[4,3],8:[4,3],9:[4,3,2],10:[4,3,2],
+    11:[4,3,3],12:[4,3,3],13:[4,3,3,1],14:[4,3,3,1],15:[4,3,3,2],16:[4,3,3,2],
+    17:[4,3,3,3,1],18:[4,3,3,3,1],19:[4,3,3,3,2],20:[4,3,3,3,2]
+  };
+  const trucos = n => n>=14?4 : n>=10?3 : 2;
+  const infusiones = n => n>=18?[12,6] : n>=14?[10,5] : n>=10?[8,4] : n>=6?[6,3] : n>=2?[4,2] : [0,0];
+  const bc = n => Math.ceil(n/4)+1;
+  const mod = v => Math.floor((Number(v||10)-10)/2);
+  const signo = n => (n>=0?'+':'')+n;
+
+  // Resumen de mecánicas en palabras propias (no es el texto del manual)
+  const RASGOS = [
+    [1,'Chapuzas mágicas','Con herramientas de manitas das a un objeto pequeño un efecto menor (luz, sonido, olor, mensaje). Hasta INT objetos a la vez.'],
+    [1,'Lanzamiento de conjuros','Conjuros de Artífice con INT. Necesitas herramientas de manitas o un foco de infusión. Los conjuros pueden lanzarse con rituales si los tienes preparados.'],
+    [2,'Infundir objeto','Conoces infusiones y puedes aplicarlas a objetos tras un descanso largo; los objetos infundidos superan el tope al final del descanso.'],
+    [3,'Especialidad de Artífice','Eliges la subclase: Alquimista, Armero, Artillero o Forjador de Batalla.'],
+    [3,'La herramienta adecuada','Con herramientas de manitas, en 1 hora creas un juego de herramientas de artesano que dura hasta que uses el rasgo otra vez.'],
+    [4,'Mejora de característica',''],
+    [6,'Pericia con herramientas','Doble competencia en toda prueba con herramientas en las que seas competente.'],
+    [7,'Destello de genio','Reacción: sumas tu mod. de INT a una prueba o salvación que tú u otro a 30 pies acaben de tirar. Usos = mod. de INT por descanso largo.'],
+    [8,'Mejora de característica',''],
+    [10,'Adepto de objetos mágicos','Sintonizas con 4 objetos; fabricas objetos comunes o infrecuentes en un cuarto del tiempo y a mitad de precio.'],
+    [11,'Objeto almacenador de conjuros','Al terminar un descanso largo guardas un conjuro de nivel 1 o 2 en un objeto; se lanza como acción hasta 2×INT veces.'],
+    [12,'Mejora de característica',''],
+    [14,'Erudito de objetos mágicos','Sintonizas con 5 objetos e ignoras requisitos de clase, raza, nivel o alineamiento para sintonizar.'],
+    [15,'Especialidad: rasgo de nivel 15',''],
+    [16,'Mejora de característica',''],
+    [18,'Maestro de objetos mágicos','Sintonizas con 6 objetos.'],
+    [19,'Mejora de característica',''],
+    [20,'Alma de artificio','+1 a todas las salvaciones por cada objeto mágico sintonizado; al caer a 0 PG puedes acabar una infusión para quedarte en 1 PG.']
+  ];
+
+  // ---------- Estado ----------
+  // Personaje inicial: Artífice Armero (Guardián) · Goblin (Mordenkainen) · nivel 10 · compra de puntos
+  // FUE 8 · DES 12 · CON 14+1+1 · INT 15+2+1+2 · SAB 12 · CAR 11  (27 puntos + goblin +2/+1 + mejoras nv 4 y 8)
+  const porDefecto = () => ({
+    nombre:'Yako', jugador:'Claudio', raza:'Goblin (Mordenkainen)', trasfondo:'Constructor naval', alineamiento:'', nivel:10, subclase:'Armero',
+    atributos:{fue:8,des:12,con:16,int:20,sab:12,car:11},
+    salv:{fue:false,des:false,con:true,int:true,sab:false,car:false},
+    habs:Object.assign(Object.fromEntries(HABS.map(h=>[h[0],0])), {arcanos:1, investigacion:1, historia:1, percepcion:1}),
+    ca:23, velocidad:30, hpMax:83, hpActual:83, hpTemp:0, dgUsados:0, iniExtra:0, salvExtra:1,
+    ataques:[
+      {nombre:'Guanteletes de Trueno (Arma mejorada +2)', atr:'int', comp:true, bono:2, dados:'1d8', sinMod:false, tipo:'trueno · el objetivo tiene desventaja para atacar a otros hasta tu próximo turno'},
+      {nombre:'Homúnculo: Golpe de fuerza (30 pies)', atr:'int', comp:true, bono:0, dados:'1d4+4', sinMod:true, tipo:'fuerza · actúa en tu turno con tu acción adicional'}
+    ],
+    conjuros:[
+      {nombre:'Rayo de fuego (truco)', nivel:0, tipo:'ataque', dados:'2d10', salv:'', nota:'120 pies, fuego'},
+      {nombre:'Orientación (truco)', nivel:0, tipo:'ninguno', dados:'1d4', salv:'', nota:'Toque, concentración: +1d4 a una prueba de característica'},
+      {nombre:'Reparar (truco)', nivel:0, tipo:'ninguno', dados:'', salv:'', nota:'1 minuto, repara una rotura'},
+      {nombre:'Proyectil mágico (Armero)', nivel:1, tipo:'ninguno', dados:'3d4+3', salv:'', nota:'3 dardos de 1d4+1, fuerza, 120 pies, impacto automático', siempre:true, preparado:false},
+      {nombre:'Onda atronadora (Armero)', nivel:1, tipo:'salvacion', dados:'2d8', salv:'CON', nota:'CON · cubo 15 pies · trueno, empuja 10 pies', siempre:true, preparado:false},
+      {nombre:'Absorber elementos', nivel:1, tipo:'ninguno', dados:'', salv:'', nota:'Reacción: resistencia al daño elemental; +1d6 en el próximo golpe cuerpo a cuerpo', siempre:false, preparado:true},
+      {nombre:'Curar heridas', nivel:1, tipo:'ninguno', dados:'1d8+5', salv:'', nota:'Toque', siempre:false, preparado:true},
+      {nombre:'Fuego feérico', nivel:1, tipo:'salvacion', dados:'', salv:'DES', nota:'DES · cubo 20 pies · ventaja para atacar a los afectados', siempre:false, preparado:true},
+      {nombre:'Santuario', nivel:1, tipo:'ninguno', dados:'', salv:'', nota:'Acción adicional · quien ataque al objetivo tira salvación de SAB', siempre:false, preparado:true},
+      {nombre:'Imagen múltiple (Armero)', nivel:2, tipo:'ninguno', dados:'', salv:'', nota:'3 duplicados, 1 minuto, sin concentración', siempre:true, preparado:false},
+      {nombre:'Destrozar (Armero)', nivel:2, tipo:'salvacion', dados:'3d8', salv:'CON', nota:'CON · esfera 10 pies · trueno · 60 pies', siempre:true, preparado:false},
+      {nombre:'Ayuda', nivel:2, tipo:'ninguno', dados:'', salv:'', nota:'+5 PG máximos y actuales a 3 criaturas, 8 horas', siempre:false, preparado:true},
+      {nombre:'Calentar metal', nivel:2, tipo:'salvacion', dados:'2d8', salv:'CON', nota:'CON para no soltar el objeto · fuego · acción adicional para repetir', siempre:false, preparado:true},
+      {nombre:'Restablecimiento menor', nivel:2, tipo:'ninguno', dados:'', salv:'', nota:'Quita ceguera, sordera, parálisis o envenenamiento', siempre:false, preparado:true},
+      {nombre:'Patrón hipnótico (Armero)', nivel:3, tipo:'salvacion', dados:'', salv:'SAB', nota:'SAB · cubo 30 pies · hechizados e incapacitados · concentración', siempre:true, preparado:false},
+      {nombre:'Relámpago (Armero)', nivel:3, tipo:'salvacion', dados:'8d6', salv:'DES', nota:'DES · línea 100 pies · relámpago', siempre:true, preparado:false},
+      {nombre:'Disipar magia', nivel:3, tipo:'ninguno', dados:'', salv:'', nota:'Prueba de INT (CD 10 + nivel del conjuro) para efectos de nivel 4+', siempre:false, preparado:true},
+      {nombre:'Celeridad', nivel:3, tipo:'ninguno', dados:'', salv:'', nota:'Concentración · velocidad ×2, +2 CA, ventaja en DES, acción extra', siempre:false, preparado:true},
+      {nombre:'Revivificar', nivel:3, tipo:'ninguno', dados:'', salv:'', nota:'Diamantes por 300 po · muerto hace menos de 1 minuto', siempre:false, preparado:true}
+    ],
+    slotsUsados:{1:0,2:0,3:0,4:0,5:0},
+    destelloUsados:0,
+    contadores:[
+      {nombre:'Campo Defensivo (PG temporales = nivel)', max:4, usados:0, mensaje:'Acción adicional: gana 10 PG temporales hasta que acaben o hasta el próximo descanso largo', corto:false},
+      {nombre:'Furia de los Pequeños (+4 daño)', max:4, usados:0, mensaje:'+4 de daño a una criatura más grande que yo (una vez por turno)', corto:false}
+    ],
+    infusiones:[
+      'Defensa mejorada (+2 CA a nivel 10) — escudo',
+      'Arma mejorada (+2 ataque y daño a nivel 10) — Guanteletes de Trueno',
+      'Replicar objeto mágico: Botas aladas — botas de la Armadura Arcana (vuelo igual a tu velocidad, 4 horas al día, recupera 2 h por cada 12 h sin usar)',
+      'Replicar objeto mágico: Yelmo de la Consciencia — casco de la Armadura Arcana (no puedes ser sorprendido, ventaja en iniciativa)',
+      'Replicar objeto mágico: Capa de protección (+1 CA y +1 a todas las salvaciones)',
+      'Sirviente homúnculo (gema de 100 po): CA 13, 16 PG, vuela 30 pies, Golpe de fuerza 1d4+4, Evasión, Canalizar magia (lanza por ti los conjuros de toque a 120 pies)',
+      '— En reserva (conocidas, no activas) —',
+      'Escudo de repulsión (+1 CA; reacción al ser golpeado en cuerpo a cuerpo: empuja 15 pies; 4 cargas) — requiere sintonización',
+      'Replicar objeto mágico: Bolsa de contención'
+    ].join('\n'),
+    objetosInfundidos:[
+      'Escudo → Defensa mejorada +2 → yo',
+      'Guanteletes de Trueno → Arma mejorada +2 → yo',
+      'Botas → Botas aladas → yo',
+      'Casco → Yelmo de la Consciencia → yo',
+      'Capa → Capa de protección → yo',
+      'Gema de 100 po → Sirviente homúnculo',
+      'Pechera → (sin infusión)',
+      '(6 objetos: 4 base + 2 exclusivos de las piezas de la armadura por Modificaciones de Armadura)',
+      'Sintonizaciones: botas, yelmo, capa y el arma mágica del DM = 4 de 4 (Adepto de objetos mágicos).'
+    ].join('\n'),
+    herramientas:[
+      'Herramientas de ladrón, herramientas de manitas, una de artesano a elección (clase), herramientas de herrero (Armero), herramientas de carpintero y vehículos acuáticos (Constructor naval).',
+      'Pericia con herramientas (nv 6): doble competencia en pruebas con herramientas.',
+      'Armadura: ligera, media, pesada (Armero) y escudos. Armas: simples.',
+      'Idiomas: común y goblin.'
+    ].join('\n'),
+    rasgosTexto:[
+      '— GOBLIN (Mordenkainen) —',
+      'Humanoide (goblinoide), tamaño Pequeño, 30 pies. Visión en la oscuridad 60 pies.',
+      'Ascendencia feérica: ventaja en salvaciones contra hechizado.',
+      'Furia de los Pequeños: al dañar a una criatura de tamaño mayor, +4 de daño (bono de competencia). 4 usos por descanso largo, una vez por turno.',
+      'Escape ágil: Retirarse u Ocultarse como acción adicional en cada turno.',
+      '',
+      '— ARMERO (Guardián) —',
+      'Herramientas del oficio (nv 3): competencia con armadura pesada y herramientas de herrero.',
+      'Armadura Arcana (nv 3): la armadura de placas es foco de conjuros, ignora el requisito de Fuerza, no se te puede quitar contra tu voluntad, cubre el cuerpo entero, el casco se pliega como acción adicional, se pone y se quita como acción.',
+      'Guanteletes de Trueno: arma simple cuerpo a cuerpo, 1d8 trueno, ataque y daño con INT. La criatura golpeada tiene desventaja para atacar a cualquier otro objetivo hasta el inicio de tu próximo turno.',
+      'Campo Defensivo: acción adicional, PG temporales = nivel (10). Usos = bono de competencia (4) por descanso largo.',
+      'Cambiar de modelo (Guardián ↔ Infiltrador): al acabar un descanso, con herramientas de herrero.',
+      'Ataque adicional (nv 5): dos ataques con la acción de Atacar.',
+      'Modificaciones de Armadura (nv 9): la armadura cuenta como 4 objetos para infusiones (pechera, botas, casco, arma) y el tope de objetos infundidos sube en 2 (solo para esas piezas).',
+      'Conjuros de Armero siempre preparados (no cuentan en el límite): Proyectil mágico, Onda atronadora, Imagen múltiple, Destrozar, Patrón hipnótico, Relámpago.',
+      '',
+      '— CONSTRUCTOR NAVAL (Ghosts of Saltmarsh) —',
+      '¡Yo lo arreglo!: con herramientas de carpintero y madera, reparas el casco de una embarcación por 5 × bono de competencia (20) PG; no se puede repetir hasta que el barco se repare por completo en tierra.'
+    ].join('\n'),
+    equipo:[
+      'Armadura de placas (Armadura Arcana, CA 18) + escudo (+2) → CA 23 con Defensa mejorada +2 (en el escudo) y Capa de protección +1.',
+      'ARMA MÁGICA DEL DM (con sintonización): detalles pendientes — anotar aquí y, si se usa para atacar, añadirla en Ataques.',
+      'Capa de protección: +1 a todas las salvaciones (ya sumado en la hoja).',
+      'Herramientas de ladrón, de manitas, de herrero, de carpintero y una de artesano más.',
+      'Ballesta ligera y 20 virotes (por si la armadura no está puesta).',
+      'Mochila, saco de dormir, raciones, cuerda, antorchas, cantimplora, libro en blanco, tinta y pluma, diamantes por 300 po para Revivificar.'
+    ].join('\n'),
+    notas:[
+      'Compra de puntos: FUE 8 (0) · DES 12 (4) · CON 14 (7) · INT 15 (9) · SAB 12 (4) · CAR 11 (3) = 27.',
+      'Goblin +2 INT, +1 CON. Nv 4: +1 INT, +1 CON. Nv 8: +2 INT.',
+      'PG: 8 + 9×5 + 10×3 = 83.',
+      'Conjuros preparados: 10 (INT 5 + nivel/2 = 5) + los 6 de Armero, que no cuentan. Trucos: 3.'
+    ].join('\n'),
+    modo:'normal', susurrar:false, copiarSiNo:true, soloPreparados:false
+  });
+  let S = porDefecto();
+  try{
+    const g = localStorage.getItem(CLAVE);
+    if(g){ S = Object.assign(porDefecto(), JSON.parse(g)); }
+  }catch(e){ /* sin almacenamiento: la hoja funciona igual, solo no recuerda */ }
+  function guardar(){ try{ localStorage.setItem(CLAVE, JSON.stringify(S)); }catch(e){} }
+
+  // ---------- Cálculos ----------
+  const nivel = () => Math.min(20, Math.max(1, Number(S.nivel)||1));
+  const M = k => mod(S.atributos[k]);
+  const BC = () => bc(nivel());
+  const bonoSalv = k => M(k) + (S.salv[k] ? BC() : 0) + (Number(S.salvExtra)||0);
+  const bonoHab = (k, atr) => M(atr) + (S.habs[k]===2 ? 2*BC() : S.habs[k]===1 ? BC() : 0);
+  const cdConj = () => 8 + BC() + M('int');
+  const atqConj = () => BC() + M('int');
+  const preparados = () => Math.max(1, M('int') + Math.floor(nivel()/2));
+  const iniciativa = () => M('des') + (Number(S.iniExtra)||0);
+
+  // ---------- Construcción del comando Roll20 ----------
+  function d20(bono){
+    const b = signo(bono);
+    if(S.modo==='ventaja') return `2d20kh1${b}`;
+    if(S.modo==='desventaja') return `2d20kl1${b}`;
+    return `1d20${b}`;
+  }
+  const etiquetaModo = () => S.modo==='ventaja' ? ' (ventaja)' : S.modo==='desventaja' ? ' (desventaja)' : '';
+  function plantilla(titulo, filas){
+    // filas: [[clave, valor], ...]  Valor con [[…]] lo tira Roll20.
+    const quien = txt(S.nombre) || 'Artífice';
+    let t = `&{template:default} {{name=${quien} — ${titulo}}}`;
+    for(const [k,v] of filas) t += ` {{${k}=${v}}}`;
+    return (S.susurrar ? '/w gm ' : '') + t;
+  }
+  // Texto que viaja dentro del comando: sin llaves ni corchetes, que son sintaxis de Roll20
+  const txt = s => String(s??'').replace(/[{}\[\]]/g,'').trim();
+  function limpiarDados(s){
+    // Solo permitimos lo que Roll20 entiende en una expresión de dados: dígitos, d, k, h, l, r, o, +, -, *, /, espacios y paréntesis
+    return String(s||'').replace(/[^0-9dkhlro+\-*/() ]/gi,'').trim();
+  }
+
+  // ---------- Envío al puente ----------
+  let scriptListo = false, ultimoLatido = 0, contador = 0;
+  const pendientes = new Map();
+  function registrar(clase, texto){
+    const r = document.getElementById('registro');
+    const hora = new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const div = document.createElement('div');
+    div.innerHTML = `<span class="t">[${hora}]</span> <span class="${clase}">${texto.replace(/</g,'&lt;')}</span>`;
+    r.prepend(div);
+    while(r.children.length>60) r.lastChild.remove();
+  }
+  function enviar(comando){
+    const id = 't'+Date.now()+'-'+(++contador);
+    const conectado = scriptListo && (Date.now()-ultimoLatido) < 6000;
+    if(conectado){
+      window.postMessage({canal:'hoja-dnd', tipo:'tirada', id, comando}, '*');
+      pendientes.set(id, comando);
+      registrar('t', 'Enviando → ' + comando);
+      setTimeout(()=>{ if(pendientes.has(id)){ pendientes.delete(id); registrar('mal','Sin respuesta de Roll20 en 5 s: ' + comando); } }, 5000);
+    }else{
+      if(S.copiarSiNo && navigator.clipboard){
+        navigator.clipboard.writeText(comando).then(
+          ()=>registrar('mal','Sin conexión con Roll20. Comando COPIADO al portapapeles: ' + comando),
+          ()=>registrar('mal','Sin conexión con Roll20 y no pude copiar: ' + comando));
+      }else registrar('mal','Sin conexión con Roll20: ' + comando);
+    }
+  }
+  window.addEventListener('message', ev=>{
+    const d = ev.data; if(!d || d.canal!=='hoja-dnd') return;
+    if(d.tipo==='script-listo'){ scriptListo = true; actualizarEstado(); }
+    if(d.tipo==='latido'){ ultimoLatido = Number(d.t)||Date.now(); actualizarEstado(); }
+    if(d.tipo==='resultado'){
+      const c = pendientes.get(d.id); pendientes.delete(d.id);
+      if(d.ok) registrar('ok','Enviado a Roll20 ✓ ' + (c||''));
+      else registrar('mal','Roll20 rechazó la tirada: ' + (d.error||'sin detalle'));
+    }
+  });
+  function actualizarEstado(){
+    const ps = document.getElementById('puntoScript'), ts = document.getElementById('txtScript');
+    const pr = document.getElementById('puntoR20'), tr = document.getElementById('txtR20');
+    ps.className = 'punto ' + (scriptListo?'ok':'mal');
+    ts.textContent = scriptListo ? 'Script: activo' : 'Script: no detectado';
+    document.getElementById('avisoScript').classList.toggle('oculto', scriptListo);
+    const edad = Date.now()-ultimoLatido;
+    if(!scriptListo){ pr.className='punto'; tr.textContent='Roll20: —'; }
+    else if(edad<6000){ pr.className='punto ok'; tr.textContent='Roll20: conectado'; }
+    else { pr.className='punto medio'; tr.textContent='Roll20: sin señal (abre la partida)'; }
+  }
+  setInterval(actualizarEstado, 2000);
+  // Por si el script cargó antes que la hoja
+  window.postMessage({canal:'hoja-dnd', tipo:'hoja-lista'}, '*');
+
+  // ---------- Render ----------
+  const $ = s => document.querySelector(s);
+  function renderAtributos(){
+    const c = $('#atributos'); c.innerHTML='';
+    for(const a of ATRS){
+      const d = document.createElement('div'); d.className='atr';
+      d.innerHTML = `<div class="nom">${a.n.toUpperCase()}</div>
+        <div class="mod">${signo(M(a.k))}</div>
+        <input type="number" min="1" max="30" value="${S.atributos[a.k]}" data-atr="${a.k}">
+        <label class="salv"><input type="checkbox" data-salv="${a.k}" ${S.salv[a.k]?'checked':''}> Salv. ${signo(bonoSalv(a.k))}</label>
+        <div class="botones"><button class="tirar" data-prueba="${a.k}">Prueba</button><button class="tirar" data-tsalv="${a.k}">Salvación</button></div>`;
+      c.appendChild(d);
+    }
+  }
+  function renderHabilidades(){
+    const t = $('#habilidades');
+    t.innerHTML = '<tr><th>Comp.</th><th>Habilidad</th><th>Atr.</th><th style="text-align:center">Bono</th><th></th></tr>';
+    for(const [k,n,atr] of HABS){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><span class="comp">
+          <button data-comp="${k}" data-v="0" class="${S.habs[k]===0?'on':''}" title="Sin competencia">○</button>
+          <button data-comp="${k}" data-v="1" class="${S.habs[k]===1?'on':''}" title="Competente">●</button>
+          <button data-comp="${k}" data-v="2" class="${S.habs[k]===2?'on':''}" title="Pericia">★</button></span></td>
+        <td>${n}</td><td class="marca">${atr.toUpperCase()}</td><td class="num">${signo(bonoHab(k,atr))}</td>
+        <td class="acc"><button class="tirar" data-hab="${k}">Tirar</button></td>`;
+      t.appendChild(tr);
+    }
+    $('#percPasiva').textContent = 10 + bonoHab('percepcion','sab');
+  }
+  function renderAtaques(){
+    const c = $('#ataques'); c.innerHTML='';
+    S.ataques.forEach((a,i)=>{
+      const bonoAtq = (a.comp?BC():0) + M(a.atr) + (Number(a.bono)||0);
+      const bonoDano = (a.sinMod?0:M(a.atr)) + (Number(a.bono)||0);
+      const d = document.createElement('div'); d.className='item ataque-grid';
+      d.innerHTML = `
+        <div><small>Nombre</small><input type="text" value="${esc(a.nombre)}" data-ai="${i}" data-af="nombre"></div>
+        <div><small>Atributo</small><select data-ai="${i}" data-af="atr">${ATRS.map(x=>`<option value="${x.k}" ${a.atr===x.k?'selected':''}>${x.ab}</option>`).join('')}</select></div>
+        <div><small>Competente</small><input type="checkbox" ${a.comp?'checked':''} data-ai="${i}" data-af="comp"></div>
+        <div><small>Bono (mágico…)</small><input type="number" value="${Number(a.bono)||0}" data-ai="${i}" data-af="bono" style="width:100%"></div>
+        <div><small>Dados de daño</small><input type="text" value="${esc(a.dados)}" data-ai="${i}" data-af="dados" placeholder="1d8"></div>
+        <div><small>Tipo · <label><input type="checkbox" ${a.sinMod?'checked':''} data-ai="${i}" data-af="sinMod"> sin mod</label></small><input type="text" value="${esc(a.tipo)}" data-ai="${i}" data-af="tipo" placeholder="cortante"></div>
+        <div><small>Ataque ${signo(bonoAtq)} · Daño ${limpiarDados(a.dados)||'—'}${bonoDano?signo(bonoDano):''}</small><div class="fila" style="gap:4px"><button class="tirar" data-atacar="${i}">Atacar</button><button class="tirar" data-atacar2="${i}" title="Ataque adicional: dos ataques">×2</button></div></div>
+        <div><small>&nbsp;</small><button class="sec peligro" data-borrarAtq="${i}" title="Quitar">×</button></div>`;
+      c.appendChild(d);
+    });
+  }
+  function renderConjuros(){
+    $('#cdTxt').textContent = cdConj();
+    $('#atqConjTxt').textContent = signo(atqConj());
+    const nPrep = S.conjuros.filter(c=>Number(c.nivel)>0 && !c.siempre && c.preparado).length;
+    $('#prepTxt').textContent = `${nPrep} / ${preparados()}`;
+    $('#prepTxt').style.color = nPrep>preparados() ? 'var(--rojo)' : '';
+    $('#trucosTxt').textContent = trucos(nivel());
+    const sl = SLOTS[nivel()], c = $('#slots'); c.innerHTML='';
+    sl.forEach((max,idx)=>{
+      const nv = idx+1, usados = Math.min(max, Number(S.slotsUsados[nv])||0);
+      const d = document.createElement('div'); d.className='slot';
+      d.innerHTML = `<small>Nivel ${nv}</small><div class="cajitas">${Array.from({length:max},(_,j)=>`<span class="${j<usados?'usado':''}" data-slot="${nv}" data-j="${j}"></span>`).join('')}</div><span class="marca">${max-usados}/${max}</span>`;
+      c.appendChild(d);
+    });
+    const lc = $('#conjuros'); lc.innerHTML='';
+    S.conjuros.forEach((s,i)=>{
+      const truco = Number(s.nivel)===0, listo = truco || s.siempre || s.preparado;
+      if(S.soloPreparados && !listo) return;
+      const d = document.createElement('div'); d.className='item conjuro-grid' + (listo?'':' no-preparado');
+      d.innerHTML = `
+        <div class="prep"><small>Prep.</small>${truco ? '<span class="siempre">truco</span>' : s.siempre ? '<span class="siempre">siempre</span>' : `<input type="checkbox" ${s.preparado?'checked':''} data-ci="${i}" data-cf="preparado" title="Preparado hoy">`}</div>
+        <div><small>Nombre</small><input type="text" value="${esc(s.nombre)}" data-ci="${i}" data-cf="nombre"></div>
+        <div><small>Nivel</small><select data-ci="${i}" data-cf="nivel">${[0,1,2,3,4,5].map(n=>`<option value="${n}" ${Number(s.nivel)===n?'selected':''}>${n===0?'Truco':n}</option>`).join('')}</select></div>
+        <div><small>Tirada</small><select data-ci="${i}" data-cf="tipo">
+            <option value="ninguno" ${s.tipo==='ninguno'?'selected':''}>Sin tirada</option>
+            <option value="ataque" ${s.tipo==='ataque'?'selected':''}>Ataque de conjuro</option>
+            <option value="salvacion" ${s.tipo==='salvacion'?'selected':''}>Salvación (CD ${cdConj()})</option></select></div>
+        <div><small>Daño / cura</small><input type="text" value="${esc(s.dados)}" data-ci="${i}" data-cf="dados" placeholder="2d8"></div>
+        <div><small>Nota</small><input type="text" value="${esc(s.nota)}" data-ci="${i}" data-cf="nota"></div>
+        <div><small>&nbsp;</small><button class="tirar" data-lanzar="${i}">Lanzar</button></div>
+        <div><small>&nbsp;</small><div class="fila" style="gap:4px"><button class="sec" data-siempre="${i}" title="${s.siempre?'Quitar «siempre preparado»':'Marcar como siempre preparado (no cuenta en el límite)'}" style="${truco?'visibility:hidden':''}">${s.siempre?'∞ sí':'∞'}</button><button class="sec peligro" data-borrarConj="${i}" title="Quitar">×</button></div></div>`;
+      lc.appendChild(d);
+    });
+  }
+  function renderContadores(){
+    const c = $('#contadores'); c.innerHTML='';
+    (S.contadores||[]).forEach((r,i)=>{
+      const max = Number(r.max)||0, usados = Math.min(max, Number(r.usados)||0);
+      const d = document.createElement('div'); d.className='item'; d.style.gridTemplateColumns='1fr';
+      d.innerHTML = `
+        <div class="fila">
+          <div style="flex:2"><small>Recurso</small><input type="text" value="${esc(r.nombre)}" data-ri="${i}" data-rf="nombre"></div>
+          <div style="flex:0"><small>Máx.</small><input type="number" value="${max}" min="0" data-ri="${i}" data-rf="max"></div>
+          <div style="flex:0"><small>Corto</small><input type="checkbox" ${r.corto?'checked':''} data-ri="${i}" data-rf="corto" title="Se restaura también con descanso corto"></div>
+        </div>
+        <div><small>Qué anuncia en el chat</small><input type="text" value="${esc(r.mensaje)}" data-ri="${i}" data-rf="mensaje"></div>
+        <div class="fila"><span class="cajitas" style="display:flex;gap:3px">${Array.from({length:max},(_,j)=>`<span style="width:14px;height:14px;border:2px solid var(--cobre);border-radius:3px;display:inline-block;${j<usados?'background:var(--cobre)':''}"></span>`).join('')}</span>
+          <b>${max-usados}/${max}</b><span class="sep"></span>
+          <button class="tirar" data-usar="${i}">Usar</button><button class="sec" data-reponer="${i}">Reponer</button><button class="sec peligro" data-borrarCont="${i}" title="Quitar">×</button></div>`;
+      c.appendChild(d);
+    });
+  }
+  function renderRecursos(){
+    const [con, obj] = infusiones(nivel());
+    $('#infConTxt').textContent = nivel()>=2 ? con : '— (nivel 2)';
+    $('#infObjTxt').textContent = nivel()>=2 ? (S.subclase==='Armero' && nivel()>=9 ? `${obj} +2` : String(obj)) : '—';
+    const usosMax = Math.max(1, M('int'));
+    if(nivel()>=7){ $('#cajaDestello').style.opacity='1'; $('#destelloRest').textContent = `${Math.max(0,usosMax-(Number(S.destelloUsados)||0))} / ${usosMax}`; }
+    else { $('#cajaDestello').style.opacity='.5'; $('#destelloRest').textContent = 'nivel 7'; }
+    $('#dgTxt').textContent = `de ${nivel()}d8`;
+    const ul = $('#rasgos'); ul.innerHTML='';
+    for(const [n,t,d] of RASGOS){
+      const li = document.createElement('li'); li.className = n<=nivel() ? '' : 'futuro';
+      li.innerHTML = `<b>Nv ${n} · ${t}</b>${d?' — '+d:''}`; ul.appendChild(li);
+    }
+  }
+  function renderTodo(){
+    $('#bcTxt').textContent = signo(BC());
+    $('#iniTxt').textContent = signo(iniciativa());
+    document.querySelectorAll('[data-k]').forEach(el=>{
+      const v = S[el.dataset.k];
+      if(el.type==='checkbox') el.checked = !!v; else el.value = v ?? '';
+    });
+    $('#modo').value = S.modo; $('#susurrar').checked = !!S.susurrar; $('#copiarSiNo').checked = !!S.copiarSiNo; $('#soloPreparados').checked = !!S.soloPreparados;
+    renderAtributos(); renderHabilidades(); renderAtaques(); renderConjuros(); renderRecursos(); renderContadores();
+  }
+  const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+  // ---------- Eventos ----------
+  document.addEventListener('input', ev=>{
+    const el = ev.target;
+    if(el.dataset.k){
+      S[el.dataset.k] = el.type==='checkbox' ? el.checked : (el.type==='number' ? Number(el.value) : el.value);
+      guardar();
+      if(['nivel','iniExtra','salvExtra','subclase'].includes(el.dataset.k)) renderTodo();
+      return;
+    }
+    if(el.dataset.atr){ S.atributos[el.dataset.atr] = Number(el.value)||10; guardar(); renderTodo(); return; }
+    if(el.dataset.ai!==undefined){
+      const a = S.ataques[el.dataset.ai], f = el.dataset.af;
+      a[f] = el.type==='checkbox' ? el.checked : el.value; guardar();
+      if(el.type!=='text') renderAtaques(); else { /* refrescar el resumen sin perder el foco */ actualizarResumenAtaque(el.dataset.ai); }
+      return;
+    }
+    if(el.dataset.ci!==undefined){
+      const s = S.conjuros[el.dataset.ci];
+      s[el.dataset.cf] = el.type==='checkbox' ? el.checked : el.value; guardar();
+      if(el.type==='checkbox' || el.dataset.cf==='nivel') renderConjuros();
+      return;
+    }
+    if(el.dataset.ri!==undefined){
+      const r = S.contadores[el.dataset.ri]; r[el.dataset.rf] = el.type==='checkbox' ? el.checked : (el.type==='number' ? Number(el.value) : el.value); guardar();
+      if(el.type!=='text') renderContadores(); return;
+    }
+  });
+  function actualizarResumenAtaque(i){
+    const a = S.ataques[i]; const item = document.querySelectorAll('#ataques .item')[i]; if(!item) return;
+    const bonoAtq = (a.comp?BC():0) + M(a.atr) + (Number(a.bono)||0);
+    const bonoDano = (a.sinMod?0:M(a.atr)) + (Number(a.bono)||0);
+    const small = item.querySelector('[data-atacar]').closest('.fila').previousElementSibling;
+    small.textContent = `Ataque ${signo(bonoAtq)} · Daño ${limpiarDados(a.dados)||'—'}${bonoDano?signo(bonoDano):''}`;
+  }
+  document.addEventListener('change', ev=>{
+    const el = ev.target;
+    if(el.dataset.salv){ S.salv[el.dataset.salv] = el.checked; guardar(); renderAtributos(); }
+    if(el.id==='modo'){ S.modo = el.value; guardar(); }
+    if(el.id==='susurrar'){ S.susurrar = el.checked; guardar(); }
+    if(el.id==='copiarSiNo'){ S.copiarSiNo = el.checked; guardar(); }
+    if(el.id==='soloPreparados'){ S.soloPreparados = el.checked; guardar(); renderConjuros(); }
+  });
+  document.addEventListener('click', ev=>{
+    const b = ev.target.closest('button, span[data-slot]'); if(!b) return;
+    const d = b.dataset;
+    if(d.comp){ S.habs[d.comp] = Number(d.v); guardar(); renderHabilidades(); return; }
+    if(d.prueba){ const a = ATRS.find(x=>x.k===d.prueba); enviar(plantilla(`Prueba de ${a.n}${etiquetaModo()}`, [['Resultado',`[[${d20(M(a.k))}]]`]])); return; }
+    if(d.tsalv){ const a = ATRS.find(x=>x.k===d.tsalv); enviar(plantilla(`Salvación de ${a.n}${etiquetaModo()}`, [['Resultado',`[[${d20(bonoSalv(a.k))}]]`]])); return; }
+    if(d.hab){ const h = HABS.find(x=>x[0]===d.hab); enviar(plantilla(`${h[1]}${etiquetaModo()}`, [['Resultado',`[[${d20(bonoHab(h[0],h[2]))}]]`]])); return; }
+    if(d.atacar!==undefined || d.atacar2!==undefined){
+      const veces = d.atacar2!==undefined ? 2 : 1;
+      const a = S.ataques[d.atacar ?? d.atacar2];
+      const bonoAtq = (a.comp?BC():0) + M(a.atr) + (Number(a.bono)||0);
+      const bonoDano = (a.sinMod?0:M(a.atr)) + (Number(a.bono)||0);
+      const dados = limpiarDados(a.dados);
+      const filas = [];
+      for(let n=1;n<=veces;n++){
+        const suf = veces>1 ? ' '+n : '';
+        filas.push(['Ataque'+suf,`[[${d20(bonoAtq)}]]`]);
+        if(dados) filas.push(['Daño'+suf,`[[${dados}${bonoDano?signo(bonoDano):''}]] ${txt(a.tipo)}`]);
+      }
+      enviar(plantilla(`${txt(a.nombre)||'Ataque'}${veces>1?' (ataque adicional)':''}${etiquetaModo()}`, filas)); return;
+    }
+    if(d.usar!==undefined){
+      const c = S.contadores[d.usar]; const max = Number(c.max)||0;
+      if((Number(c.usados)||0)>=max){ registrar('mal',`No quedan usos de ${c.nombre}.`); return; }
+      c.usados = (Number(c.usados)||0)+1; guardar(); renderContadores();
+      enviar(plantilla(txt(c.nombre)||'Recurso', [['Efecto', txt(c.mensaje)||'—'],['Usos restantes',`${max-c.usados} de ${max}`]])); return;
+    }
+    if(d.reponer!==undefined){ S.contadores[d.reponer].usados = 0; guardar(); renderContadores(); return; }
+    if(d.borrarCont!==undefined){ S.contadores.splice(d.borrarCont,1); guardar(); renderContadores(); return; }
+    if(d.lanzar!==undefined){
+      const s = S.conjuros[d.lanzar]; const filas = [];
+      filas.push(['Nivel', Number(s.nivel)===0 ? 'Truco' : `Nivel ${s.nivel}`]);
+      if(s.tipo==='ataque') filas.push(['Ataque de conjuro',`[[${d20(atqConj())}]]`]);
+      if(s.tipo==='salvacion') filas.push(['Salvación', `CD ${cdConj()} ${txt(s.nota)}`.trim()]);
+      const dados = limpiarDados(s.dados); if(dados) filas.push(['Daño / efecto',`[[${dados}]]`]);
+      if(s.tipo!=='salvacion' && s.nota) filas.push(['Nota', txt(s.nota)]);
+      enviar(plantilla(`${txt(s.nombre)||'Conjuro'}${s.tipo==='ataque'?etiquetaModo():''}`, filas)); return;
+    }
+    if(d.slot){ const nv = d.slot, j = Number(d.j); const usados = Number(S.slotsUsados[nv])||0; S.slotsUsados[nv] = (j < usados) ? j : j+1; guardar(); renderConjuros(); return; }
+    if(d.borrarAtq!==undefined){ S.ataques.splice(d.borrarAtq,1); guardar(); renderAtaques(); return; }
+    if(d.borrarConj!==undefined){ S.conjuros.splice(d.borrarConj,1); guardar(); renderConjuros(); return; }
+    if(d.siempre!==undefined){ const c = S.conjuros[d.siempre]; c.siempre = !c.siempre; if(c.siempre) c.preparado = false; guardar(); renderConjuros(); return; }
+    switch(b.id){
+      case 'btnIni': enviar(plantilla(`Iniciativa${etiquetaModo()}`, [['Resultado',`[[${d20(iniciativa())}]]`]])); break;
+      case 'btnMuerte': enviar(plantilla('Salvación de muerte', [['Resultado','[[1d20]]'],['Regla','10 o más: éxito · 1: dos fallos · 20: recuperas 1 PG']])); break;
+      case 'btnDG': {
+        if((Number(S.dgUsados)||0) >= nivel()){ registrar('mal','No quedan dados de golpe.'); break; }
+        S.dgUsados = (Number(S.dgUsados)||0)+1; guardar(); renderTodo();
+        enviar(plantilla('Dado de golpe', [['Recuperas',`[[1d8${signo(M('con'))}]] PG`],['Restantes',`${nivel()-S.dgUsados} de ${nivel()}`]])); break; }
+      case 'btnLibre': { const x = limpiarDados($('#libre').value); if(!x){ registrar('mal','Escribe una expresión de dados, por ejemplo 2d6+3.'); break; } enviar(plantilla('Tirada libre', [[x,`[[${x}]]`]])); break; }
+      case 'btnAtqConj': enviar(plantilla(`Ataque de conjuro${etiquetaModo()}`, [['Resultado',`[[${d20(atqConj())}]]`],['CD de salvación', String(cdConj())]])); break;
+      case 'btnDestello': {
+        if(nivel()<7){ registrar('mal','Destello de genio se obtiene a nivel 7.'); break; }
+        const max = Math.max(1,M('int')); if((Number(S.destelloUsados)||0)>=max){ registrar('mal','No quedan usos de Destello de genio.'); break; }
+        S.destelloUsados = (Number(S.destelloUsados)||0)+1; guardar(); renderRecursos();
+        enviar(plantilla('Destello de genio', [['Efecto',`+${M('int')} a la prueba o salvación (reacción)`],['Usos restantes',`${max-S.destelloUsados} de ${max}`]])); break; }
+      case 'btnDescansoCorto': (S.contadores||[]).forEach(r=>{ if(r.corto) r.usados=0; }); guardar(); renderContadores(); registrar('t','Descanso corto: recursos de descanso corto restaurados. Gasta dados de golpe desde «Dado de golpe».'); break;
+      case 'btnDescansoLargo': {
+        for(const k in S.slotsUsados) S.slotsUsados[k]=0;
+        S.destelloUsados = 0; S.hpActual = S.hpMax; S.hpTemp = 0; (S.contadores||[]).forEach(r=>r.usados=0);
+        S.dgUsados = Math.max(0, (Number(S.dgUsados)||0) - Math.max(1, Math.floor(nivel()/2)));
+        guardar(); renderTodo(); registrar('ok','Descanso largo: PG al máximo, espacios y Destello restaurados, recuperas la mitad de los dados de golpe.'); break; }
+      case 'btnNuevoAtaque': S.ataques.push({nombre:'', atr:'des', comp:true, bono:0, dados:'1d6', sinMod:false, tipo:''}); guardar(); renderAtaques(); break;
+      case 'btnNuevoContador': (S.contadores=S.contadores||[]).push({nombre:'', max:1, usados:0, mensaje:'', corto:false}); guardar(); renderContadores(); break;
+      case 'btnNuevoConjuro': S.conjuros.push({nombre:'', nivel:1, tipo:'ninguno', dados:'', salv:'', nota:'', preparado:true, siempre:false, siempre:false, preparado:true}); guardar(); renderConjuros(); break;
+      case 'btnLimpiarRegistro': $('#registro').innerHTML=''; break;
+      case 'btnBorrarTodo': if(confirm('¿Borrar toda la hoja y volver a los valores iniciales?')){ S = porDefecto(); guardar(); renderTodo(); } break;
+      case 'btnExportar': {
+        const blob = new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `${(S.nombre||'artifice').replace(/[^\w\-]+/g,'_')}.json`; a.click(); URL.revokeObjectURL(a.href); break; }
+      case 'btnImportar': $('#archivoImportar').click(); break;
+    }
+  });
+  $('#archivoImportar').addEventListener('change', ev=>{
+    const f = ev.target.files[0]; if(!f) return;
+    f.text().then(txt=>{ try{ S = Object.assign(porDefecto(), JSON.parse(txt)); guardar(); renderTodo(); registrar('ok','Hoja importada: '+f.name); }catch(e){ registrar('mal','El archivo no es un JSON válido.'); } });
+    ev.target.value='';
+  });
+
+  renderTodo();
+  actualizarEstado();
+  // Expuesto para pruebas automatizadas
+  window.__hoja = { plantilla, d20, estado:()=>S };
+})();
+</script>
+</body>
+</html>
