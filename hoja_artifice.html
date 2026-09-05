@@ -320,6 +320,9 @@
     ca:23, velocidad:30, hpMax:83, hpActual:83, hpTemp:0, dgUsados:0, iniExtra:0, salvExtra:1,
     ataques:[
       {nombre:'Guanteletes de Trueno (Arma mejorada +2)', atr:'int', comp:true, bono:2, dados:'1d8', sinMod:false, tipo:'trueno · el objetivo tiene desventaja para atacar a otros hasta tu próximo turno'},
+      {nombre:'Cañón de hombro I — Disparo estándar (1 carga)', atr:'int', comp:true, bono:0, dados:'2d6', sinMod:false, tipo:'perforante · a distancia'},
+      {nombre:'Cañón de hombro II — Sobrecarga (1 carga)', atr:'int', comp:true, bono:0, dados:'1d6+1d6', sinMod:false, tipo:'1d6 perforante + 1d6 fuego o eléctrico · el objetivo no puede usar reacciones hasta el inicio de tu próximo turno'},
+      {nombre:'Cañón de hombro III — Disparo devastador (1 carga)', atr:'int', comp:true, bono:0, dados:'4d6', sinMod:false, tipo:'+ explosión alrededor del objetivo (dados por confirmar) · después: SOBRECALENTADO 1 minuto (pulsa Reponer en el rastreador)'},
       {nombre:'Homúnculo: Golpe de fuerza (30 pies)', atr:'int', comp:true, bono:0, dados:'1d4+4', sinMod:true, tipo:'fuerza · actúa en tu turno con tu acción adicional'}
     ],
     conjuros:[
@@ -347,7 +350,9 @@
     destelloUsados:0,
     contadores:[
       {nombre:'Campo Defensivo (PG temporales = nivel)', max:4, usados:0, mensaje:'Acción adicional: gana 10 PG temporales hasta que acaben o hasta el próximo descanso largo', corto:false},
-      {nombre:'Furia de los Pequeños (+4 daño)', max:4, usados:0, mensaje:'+4 de daño a una criatura más grande que yo (una vez por turno)', corto:false}
+      {nombre:'Furia de los Pequeños (+4 daño)', max:4, usados:0, mensaje:'+4 de daño a una criatura más grande que yo (una vez por turno)', corto:false},
+      {nombre:'Cañón de hombro: cargas (máximo por confirmar)', max:3, usados:0, mensaje:'Gasto una carga del cañón', corto:false, tirada:''},
+      {nombre:'Cañón SOBRECALENTADO: asaltos (Usar = pasa un asalto + prueba de herrero)', max:10, usados:0, mensaje:'Inicio de turno: prueba de herramientas de herrero para enfriar el cañón (INT + pericia con herramientas)', corto:false, tirada:'1d20+13'}
     ],
     infusiones:[
       'Defensa mejorada (+2 CA a nivel 10) — escudo',
@@ -394,12 +399,20 @@
       'Modificaciones de Armadura (nv 9): la armadura cuenta como 4 objetos para infusiones (pechera, botas, casco, arma) y el tope de objetos infundidos sube en 2 (solo para esas piezas).',
       'Conjuros de Armero siempre preparados (no cuentan en el límite): Proyectil mágico, Onda atronadora, Imagen múltiple, Destrozar, Patrón hipnótico, Relámpago.',
       '',
+      '— CAÑÓN DE HOMBRO (objeto del DM) —',
+      'Tres niveles de potencia; cada disparo gasta una carga (número de cargas y recarga: por confirmar).',
+      'I · Disparo estándar: 2d6 de daño perforante.',
+      'II · Sobrecarga: 1d6 perforante + 1d6 de fuego o eléctrico (a elección), y el objetivo no puede usar reacciones hasta el inicio de mi siguiente turno.',
+      'III · Disparo devastador: 4d6 y una explosión alrededor del objetivo (dados y radio por confirmar).',
+      'Tras usar el nivel III el cañón queda SOBRECALENTADO 1 minuto (10 asaltos): no puedo dispararlo; al inicio de cada turno puedo hacer una prueba de herramientas de herrero (1d20 + INT 5 + pericia 8 = +13) y con cierto resultado (por confirmar) reduzco el tiempo restante.',
+      'Supuestos a confirmar con el DM: ataque con INT y competencia (+9) como arma especial de la armadura; ¿suma INT al daño?; alcance.',
+      '',
       '— CONSTRUCTOR NAVAL (Ghosts of Saltmarsh) —',
       '¡Yo lo arreglo!: con herramientas de carpintero y madera, reparas el casco de una embarcación por 5 × bono de competencia (20) PG; no se puede repetir hasta que el barco se repare por completo en tierra.'
     ].join('\n'),
     equipo:[
       'Armadura de placas (Armadura Arcana, CA 18) + escudo (+2) → CA 23 con Defensa mejorada +2 (en el escudo) y Capa de protección +1.',
-      'ARMA MÁGICA DEL DM (con sintonización): detalles pendientes — anotar aquí y, si se usa para atacar, añadirla en Ataques.',
+      'CAÑÓN DE HOMBRO (arma mágica del DM, con sintonización, montado en la armadura): arma a distancia automática, no ocupa las manos. Ver reglas en Rasgos.',
       'Capa de protección: +1 a todas las salvaciones (ya sumado en la hoja).',
       'Herramientas de ladrón, de manitas, de herrero, de carpintero y una de artesano más.',
       'Ballesta ligera y 20 virotes (por si la armadura no está puesta).',
@@ -597,7 +610,8 @@
           <div style="flex:0"><small>Máx.</small><input type="number" value="${max}" min="0" data-ri="${i}" data-rf="max"></div>
           <div style="flex:0"><small>Corto</small><input type="checkbox" ${r.corto?'checked':''} data-ri="${i}" data-rf="corto" title="Se restaura también con descanso corto"></div>
         </div>
-        <div><small>Qué anuncia en el chat</small><input type="text" value="${esc(r.mensaje)}" data-ri="${i}" data-rf="mensaje"></div>
+        <div class="fila"><div style="flex:3"><small>Qué anuncia en el chat</small><input type="text" value="${esc(r.mensaje)}" data-ri="${i}" data-rf="mensaje"></div>
+          <div style="flex:1;min-width:90px"><small>Tirada (opcional)</small><input type="text" value="${esc(r.tirada||'')}" data-ri="${i}" data-rf="tirada" placeholder="1d20+13"></div></div>
         <div class="fila"><span class="cajitas" style="display:flex;gap:3px">${Array.from({length:max},(_,j)=>`<span style="width:14px;height:14px;border:2px solid var(--cobre);border-radius:3px;display:inline-block;${j<usados?'background:var(--cobre)':''}"></span>`).join('')}</span>
           <b>${max-usados}/${max}</b><span class="sep"></span>
           <button class="tirar" data-usar="${i}">Usar</button><button class="sec" data-reponer="${i}">Reponer</button><button class="sec peligro" data-borrarCont="${i}" title="Quitar">×</button></div>`;
@@ -697,7 +711,10 @@
       const c = S.contadores[d.usar]; const max = Number(c.max)||0;
       if((Number(c.usados)||0)>=max){ registrar('mal',`No quedan usos de ${c.nombre}.`); return; }
       c.usados = (Number(c.usados)||0)+1; guardar(); renderContadores();
-      enviar(plantilla(txt(c.nombre)||'Recurso', [['Efecto', txt(c.mensaje)||'—'],['Usos restantes',`${max-c.usados} de ${max}`]])); return;
+      const filasC = [['Efecto', txt(c.mensaje)||'—']];
+      const dadosC = limpiarDados(c.tirada); if(dadosC) filasC.push(['Tirada',`[[${dadosC}]]`]);
+      filasC.push(['Restantes',`${max-c.usados} de ${max}`]);
+      enviar(plantilla(txt(c.nombre)||'Recurso', filasC)); return;
     }
     if(d.reponer!==undefined){ S.contadores[d.reponer].usados = 0; guardar(); renderContadores(); return; }
     if(d.borrarCont!==undefined){ S.contadores.splice(d.borrarCont,1); guardar(); renderContadores(); return; }
@@ -735,7 +752,7 @@
         S.dgUsados = Math.max(0, (Number(S.dgUsados)||0) - Math.max(1, Math.floor(nivel()/2)));
         guardar(); renderTodo(); registrar('ok','Descanso largo: PG al máximo, espacios y Destello restaurados, recuperas la mitad de los dados de golpe.'); break; }
       case 'btnNuevoAtaque': S.ataques.push({nombre:'', atr:'des', comp:true, bono:0, dados:'1d6', sinMod:false, tipo:''}); guardar(); renderAtaques(); break;
-      case 'btnNuevoContador': (S.contadores=S.contadores||[]).push({nombre:'', max:1, usados:0, mensaje:'', corto:false}); guardar(); renderContadores(); break;
+      case 'btnNuevoContador': (S.contadores=S.contadores||[]).push({nombre:'', max:1, usados:0, mensaje:'', corto:false, tirada:''}); guardar(); renderContadores(); break;
       case 'btnNuevoConjuro': S.conjuros.push({nombre:'', nivel:1, tipo:'ninguno', dados:'', salv:'', nota:'', preparado:true, siempre:false, siempre:false, preparado:true}); guardar(); renderConjuros(); break;
       case 'btnLimpiarRegistro': $('#registro').innerHTML=''; break;
       case 'btnBorrarTodo': if(confirm('¿Borrar toda la hoja y volver a los valores iniciales?')){ S = porDefecto(); guardar(); renderTodo(); } break;

@@ -61,6 +61,33 @@
       "tipo": "trueno · el objetivo tiene desventaja para atacar a otros hasta tu próximo turno"
     },
     {
+      "nombre": "Cañón de hombro I — Disparo estándar (1 carga)",
+      "atr": "int",
+      "comp": true,
+      "bono": 0,
+      "dados": "2d6",
+      "sinMod": false,
+      "tipo": "perforante · a distancia"
+    },
+    {
+      "nombre": "Cañón de hombro II — Sobrecarga (1 carga)",
+      "atr": "int",
+      "comp": true,
+      "bono": 0,
+      "dados": "1d6+1d6",
+      "sinMod": false,
+      "tipo": "1d6 perforante + 1d6 fuego o eléctrico · el objetivo no puede usar reacciones hasta el inicio de tu próximo turno"
+    },
+    {
+      "nombre": "Cañón de hombro III — Disparo devastador (1 carga)",
+      "atr": "int",
+      "comp": true,
+      "bono": 0,
+      "dados": "4d6",
+      "sinMod": false,
+      "tipo": "+ explosión alrededor del objetivo (dados por confirmar) · después: SOBRECALENTADO 1 minuto (pulsa Reponer en el rastreador)"
+    },
+    {
       "nombre": "Homúnculo: Golpe de fuerza (30 pies)",
       "atr": "int",
       "comp": true,
@@ -278,13 +305,29 @@
       "usados": 0,
       "mensaje": "+4 de daño a una criatura más grande que yo (una vez por turno)",
       "corto": false
+    },
+    {
+      "nombre": "Cañón de hombro: cargas (máximo por confirmar)",
+      "max": 3,
+      "usados": 0,
+      "mensaje": "Gasto una carga del cañón",
+      "corto": false,
+      "tirada": ""
+    },
+    {
+      "nombre": "Cañón SOBRECALENTADO: asaltos (Usar = pasa un asalto + prueba de herrero)",
+      "max": 10,
+      "usados": 0,
+      "mensaje": "Inicio de turno: prueba de herramientas de herrero para enfriar el cañón (INT + pericia con herramientas)",
+      "corto": false,
+      "tirada": "1d20+13"
     }
   ],
   "infusiones": "Defensa mejorada (+2 CA a nivel 10) — escudo\nArma mejorada (+2 ataque y daño a nivel 10) — Guanteletes de Trueno\nReplicar objeto mágico: Botas aladas — botas de la Armadura Arcana (vuelo igual a tu velocidad, 4 horas al día, recupera 2 h por cada 12 h sin usar)\nReplicar objeto mágico: Yelmo de la Consciencia — casco de la Armadura Arcana (no puedes ser sorprendido, ventaja en iniciativa)\nReplicar objeto mágico: Capa de protección (+1 CA y +1 a todas las salvaciones)\nSirviente homúnculo (gema de 100 po): CA 13, 16 PG, vuela 30 pies, Golpe de fuerza 1d4+4, Evasión, Canalizar magia (lanza por ti los conjuros de toque a 120 pies)\n— En reserva (conocidas, no activas) —\nEscudo de repulsión (+1 CA; reacción al ser golpeado en cuerpo a cuerpo: empuja 15 pies; 4 cargas) — requiere sintonización\nReplicar objeto mágico: Bolsa de contención",
   "objetosInfundidos": "Escudo → Defensa mejorada +2 → yo\nGuanteletes de Trueno → Arma mejorada +2 → yo\nBotas → Botas aladas → yo\nCasco → Yelmo de la Consciencia → yo\nCapa → Capa de protección → yo\nGema de 100 po → Sirviente homúnculo\nPechera → (sin infusión)\n(6 objetos: 4 base + 2 exclusivos de las piezas de la armadura por Modificaciones de Armadura)\nSintonizaciones: botas, yelmo, capa y el arma mágica del DM = 4 de 4 (Adepto de objetos mágicos).",
   "herramientas": "Herramientas de ladrón, herramientas de manitas, una de artesano a elección (clase), herramientas de herrero (Armero), herramientas de carpintero y vehículos acuáticos (Constructor naval).\nPericia con herramientas (nv 6): doble competencia en pruebas con herramientas.\nArmadura: ligera, media, pesada (Armero) y escudos. Armas: simples.\nIdiomas: común y goblin.",
-  "rasgosTexto": "— GOBLIN (Mordenkainen) —\nHumanoide (goblinoide), tamaño Pequeño, 30 pies. Visión en la oscuridad 60 pies.\nAscendencia feérica: ventaja en salvaciones contra hechizado.\nFuria de los Pequeños: al dañar a una criatura de tamaño mayor, +4 de daño (bono de competencia). 4 usos por descanso largo, una vez por turno.\nEscape ágil: Retirarse u Ocultarse como acción adicional en cada turno.\n\n— ARMERO (Guardián) —\nHerramientas del oficio (nv 3): competencia con armadura pesada y herramientas de herrero.\nArmadura Arcana (nv 3): la armadura de placas es foco de conjuros, ignora el requisito de Fuerza, no se te puede quitar contra tu voluntad, cubre el cuerpo entero, el casco se pliega como acción adicional, se pone y se quita como acción.\nGuanteletes de Trueno: arma simple cuerpo a cuerpo, 1d8 trueno, ataque y daño con INT. La criatura golpeada tiene desventaja para atacar a cualquier otro objetivo hasta el inicio de tu próximo turno.\nCampo Defensivo: acción adicional, PG temporales = nivel (10). Usos = bono de competencia (4) por descanso largo.\nCambiar de modelo (Guardián ↔ Infiltrador): al acabar un descanso, con herramientas de herrero.\nAtaque adicional (nv 5): dos ataques con la acción de Atacar.\nModificaciones de Armadura (nv 9): la armadura cuenta como 4 objetos para infusiones (pechera, botas, casco, arma) y el tope de objetos infundidos sube en 2 (solo para esas piezas).\nConjuros de Armero siempre preparados (no cuentan en el límite): Proyectil mágico, Onda atronadora, Imagen múltiple, Destrozar, Patrón hipnótico, Relámpago.\n\n— CONSTRUCTOR NAVAL (Ghosts of Saltmarsh) —\n¡Yo lo arreglo!: con herramientas de carpintero y madera, reparas el casco de una embarcación por 5 × bono de competencia (20) PG; no se puede repetir hasta que el barco se repare por completo en tierra.",
-  "equipo": "Armadura de placas (Armadura Arcana, CA 18) + escudo (+2) → CA 23 con Defensa mejorada +2 (en el escudo) y Capa de protección +1.\nARMA MÁGICA DEL DM (con sintonización): detalles pendientes — anotar aquí y, si se usa para atacar, añadirla en Ataques.\nCapa de protección: +1 a todas las salvaciones (ya sumado en la hoja).\nHerramientas de ladrón, de manitas, de herrero, de carpintero y una de artesano más.\nBallesta ligera y 20 virotes (por si la armadura no está puesta).\nMochila, saco de dormir, raciones, cuerda, antorchas, cantimplora, libro en blanco, tinta y pluma, diamantes por 300 po para Revivificar.",
+  "rasgosTexto": "— GOBLIN (Mordenkainen) —\nHumanoide (goblinoide), tamaño Pequeño, 30 pies. Visión en la oscuridad 60 pies.\nAscendencia feérica: ventaja en salvaciones contra hechizado.\nFuria de los Pequeños: al dañar a una criatura de tamaño mayor, +4 de daño (bono de competencia). 4 usos por descanso largo, una vez por turno.\nEscape ágil: Retirarse u Ocultarse como acción adicional en cada turno.\n\n— ARMERO (Guardián) —\nHerramientas del oficio (nv 3): competencia con armadura pesada y herramientas de herrero.\nArmadura Arcana (nv 3): la armadura de placas es foco de conjuros, ignora el requisito de Fuerza, no se te puede quitar contra tu voluntad, cubre el cuerpo entero, el casco se pliega como acción adicional, se pone y se quita como acción.\nGuanteletes de Trueno: arma simple cuerpo a cuerpo, 1d8 trueno, ataque y daño con INT. La criatura golpeada tiene desventaja para atacar a cualquier otro objetivo hasta el inicio de tu próximo turno.\nCampo Defensivo: acción adicional, PG temporales = nivel (10). Usos = bono de competencia (4) por descanso largo.\nCambiar de modelo (Guardián ↔ Infiltrador): al acabar un descanso, con herramientas de herrero.\nAtaque adicional (nv 5): dos ataques con la acción de Atacar.\nModificaciones de Armadura (nv 9): la armadura cuenta como 4 objetos para infusiones (pechera, botas, casco, arma) y el tope de objetos infundidos sube en 2 (solo para esas piezas).\nConjuros de Armero siempre preparados (no cuentan en el límite): Proyectil mágico, Onda atronadora, Imagen múltiple, Destrozar, Patrón hipnótico, Relámpago.\n\n— CAÑÓN DE HOMBRO (objeto del DM) —\nTres niveles de potencia; cada disparo gasta una carga (número de cargas y recarga: por confirmar).\nI · Disparo estándar: 2d6 de daño perforante.\nII · Sobrecarga: 1d6 perforante + 1d6 de fuego o eléctrico (a elección), y el objetivo no puede usar reacciones hasta el inicio de mi siguiente turno.\nIII · Disparo devastador: 4d6 y una explosión alrededor del objetivo (dados y radio por confirmar).\nTras usar el nivel III el cañón queda SOBRECALENTADO 1 minuto (10 asaltos): no puedo dispararlo; al inicio de cada turno puedo hacer una prueba de herramientas de herrero (1d20 + INT 5 + pericia 8 = +13) y con cierto resultado (por confirmar) reduzco el tiempo restante.\nSupuestos a confirmar con el DM: ataque con INT y competencia (+9) como arma especial de la armadura; ¿suma INT al daño?; alcance.\n\n— CONSTRUCTOR NAVAL (Ghosts of Saltmarsh) —\n¡Yo lo arreglo!: con herramientas de carpintero y madera, reparas el casco de una embarcación por 5 × bono de competencia (20) PG; no se puede repetir hasta que el barco se repare por completo en tierra.",
+  "equipo": "Armadura de placas (Armadura Arcana, CA 18) + escudo (+2) → CA 23 con Defensa mejorada +2 (en el escudo) y Capa de protección +1.\nCAÑÓN DE HOMBRO (arma mágica del DM, con sintonización, montado en la armadura): arma a distancia automática, no ocupa las manos. Ver reglas en Rasgos.\nCapa de protección: +1 a todas las salvaciones (ya sumado en la hoja).\nHerramientas de ladrón, de manitas, de herrero, de carpintero y una de artesano más.\nBallesta ligera y 20 virotes (por si la armadura no está puesta).\nMochila, saco de dormir, raciones, cuerda, antorchas, cantimplora, libro en blanco, tinta y pluma, diamantes por 300 po para Revivificar.",
   "notas": "Compra de puntos: FUE 8 (0) · DES 12 (4) · CON 14 (7) · INT 15 (9) · SAB 12 (4) · CAR 11 (3) = 27.\nGoblin +2 INT, +1 CON. Nv 4: +1 INT, +1 CON. Nv 8: +2 INT.\nPG: 8 + 9×5 + 10×3 = 83.\nConjuros preparados: 10 (INT 5 + nivel/2 = 5) + los 6 de Armero, que no cuentan. Trucos: 3.",
   "modo": "normal",
   "susurrar": false,
